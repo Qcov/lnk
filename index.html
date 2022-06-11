@@ -18,7 +18,7 @@
 
     <div class="center">
         <p class="font-large">
-            You're being redirected to... <span id="destination"></span> <span id="timeout"></span>
+            You're being redirected to... <a id="destination" href=""></a> <span id="timeout"></span>
         </p>
     
         <h2>Create link shortcut:</h2>
@@ -72,6 +72,7 @@
             } else {
                 var url = arrayToString(codes);
                 destination.textContent = url;
+                destination.href = url;
                 console.log(`Redirecting to ${url}`);
 
                 var seconds = 5;
