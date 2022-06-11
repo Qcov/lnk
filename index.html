@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qcov lnk - Infinite hub of infinite links</title>
+</head>
+<body>
+    <style>
+        .center {
+            text-align: center;
+        }
+        .font-large {
+            font-size: larger;
+        }
+    </style>
+
+    <div class="center">
+        <p class="font-large">
+            You're being redirected to... <span id="destination"></span> <span id="timeout"></span>
+        </p>
+    
+        <h2>Create link shortcut:</h2>
+        <input id="input-url" placeholder="https://google.com/">
+        <button id="submit-button">Generate</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hashids/2.2.10/hashids.min.js" integrity="sha512-c2uJyl0yoZaILXV5QC5s78uT8gQrd0MbmH3t1fXZ7j/2WfC+KJwglzdjVaYVJtfG9k3NTokOR016aP13vWwiiw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // Convert string to array
+        function stringToArray(string) {
+            var data = [];
+            for(var i = 0; i < string.length; i++) {
+                data.push(string.charCodeAt(i));
+            }
+            return data;
+        }
+
+        // Convert array to string
+        function arrayToString(array) {
+            return String.fromCharCode(...array);
+        }
+
+        // Find GET parameter
+        function findGetParameter(name) {
+            address = window.location.search;
+            all     = new URLSearchParams(address);
+            return all.get(name);
+        }
+
+        var destination = document.getElementById('destination');
+        var timer       = document.getElementById('timeout');
+        var inputUrlEl  = document.getElementById('input-url');
+        var submitEl    = document.getElementById('submit-button');
+
+        var hashid      = new Hashids()
+        var uid         = findGetParameter("uid");
+
+        submitEl.addEventListener('click', (event) => {
+            var input = inputUrlEl.value;
+            var string = stringToArray(input);
+            inputUrlEl.value = `https://qcov.github.io/lnk/?uid=${hashid.encode(string)}`
+        });
+
+        if (uid == null) {
+            destination.textContent = "Invalid URL";
+        } else {
+            var codes = hashid.decode(uid);
+            if (codes.length == 0) {
+                destination.textContent = "Invalid UID";
+            } else {
+                var url = arrayToString(codes);
+                destination.textContent = url;
+                console.log(`Redirecting to ${url}`);
+
+                var seconds = 5;
+                var timeout = setInterval(() => {
+                    timer.textContent = seconds.toString();
+                    if (seconds <= 0) {
+                        clearInterval(timeout);
+                        window.location.replace(url);
+                    }
+                    seconds--;
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
